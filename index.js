@@ -106,7 +106,7 @@ async function addDepartment() {
 };
 
 async function addRole() {
-    const [roles] = await db.promise().query("SELECT * FROM roles")
+    const [departments] = await db.promise().query("SELECT * FROM department")
     inquirer
     .prompt([
         {
@@ -123,7 +123,7 @@ async function addRole() {
             type: 'list',
             name: 'department_id',
             message: 'What is the name of the department for this role?',
-            choices: roles.map(({id, department_name}) => ({
+            choices: departments.map(({id, department_name}) => ({
                 name: department_name, 
                 value: id
             }))
@@ -131,13 +131,12 @@ async function addRole() {
     ])
     .then(async(response) => {   
         console.log([response.role, response.salary, response.department_id]);
-        start();
-    // try{
-    // await db.promise().query(`INSERT INTO roles (role_name) VALUES('${[response.department_id]}')`)
-    // viewAllRoles();
-    // } catch (err) {
-    //     console.log(err);
-    // }  
+        try{
+        await db.promise().query(`INSERT INTO roles (title, salary, department_id) VALUES('${response.role}', '${response.salary}', '${response.department_id}')`)
+        viewAllRoles();
+        } catch (err) {
+            console.log(err);
+        }  
     })
 
 
