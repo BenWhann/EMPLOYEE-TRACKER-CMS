@@ -52,6 +52,10 @@ inquirer
 
             addEmployee();
 
+        } else if (response.actions == 'Update an employee') {
+
+            updateEmployee();
+
         }
     })
 };
@@ -142,48 +146,84 @@ async function addRole() {
 
 };
 
-// async function addEmployee() {
-//     const [roles] = await db.promise().query("SELECT * FROM roles")
-//     inquirer
-//     .prompt([
-//         {
-//             type: 'input',
-//             name: 'first-name',
-//             message: "What is this employee's first name?",
-//         },
-//         {
-//             type: 'input',
-//             name: 'last-name',
-//             message: "What is this employee's last name?",
-//         },
-//         {
-//             type: 'list',
-//             name: 'role_id',
-//             message: "What is the name of this employee's role?",
-//             choices: roles.map(({id, role_name}) => ({
-//                 name: role_name, 
-//                 value: id
-//             }))
-//         },
-//         {
-//             type: 'list',
-//             name: 'manager_id',
-//             message: "What is the name of this employee's manager?",
-//             choices: departments.map(({id, manager_name}) => ({
-//                 name: manager_name, 
-//                 value: id
-//             }))
-//         },
-//     ])
-//     .then(async(response) => {   
-//         console.log(response);
-//     try{
-//     await db.promise().query(`INSERT INTO department (department_name) VALUES('${response.department}')`)
-//     viewAllDepartments();
-//     } catch (err) {
-//         console.log(err);
-//     }  
-//     })
-// };
+async function addEmployee() {
+    const [roles] = await db.promise().query("SELECT * FROM roles")
+    const [employees] = await db.promise().query("SELECT * FROM employee")
+    inquirer
+    .prompt([
+        {
+            type: 'input',
+            name: 'first',
+            message: "What is this employee's first name?",
+        },
+        {
+            type: 'input',
+            name: 'last',
+            message: "What is this employee's last name?",
+        },
+        {
+            type: 'list',
+            name: 'role_id',
+            message: "What is the name of this employee's role?",
+            choices: roles.map(({id, title}) => ({
+                name: title, 
+                value: id
+            }))
+        },
+        {
+            type: 'list',
+            name: 'manager_id',
+            message: "Who is this employee's manager?",
+            choices: employees.map(({first_name, last_name, id}) => ({
+                name: `${first_name} ${last_name}`, 
+                value: id
+            }))
+        },
+    ])
+    .then(async(response) => {   
+        console.log(response);
+    try{
+    await db.promise().query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES('${response.first}', '${response.last}', '${response.role_id}', '${response.manager_id}')`)
+    viewAllEmployees();
+    } catch (err) {
+        console.log(err);
+    }  
+    })
+};
+
+async function updateEmployee() {
+    const [roles] = await db.promise().query("SELECT * FROM roles")
+    const [employees] = await db.promise().query("SELECT * FROM employee")
+    inquirer
+    .prompt([
+        {
+            type: 'list',
+            name: 'employee_name',
+            message: 'Please choose the employee to be updated.',
+            choices: employees.map(({id, first_name, last_name}) => ({
+                name: `${first_name} ${last_name}`, 
+                value: id
+            }))
+        },
+        {
+            type: 'list',
+            name: 'roleUpdate',
+            message: "Please choose this employee's new role.",
+            choices: roles.map(({id, title}) => ({
+                name: title, 
+                value: id
+            }))
+        },
+    ])
+    .then(async(response) => {   
+        console.log(response);
+    try{
+    await db.promise().query(`UPDATE employee SET role_id=${response.roleUpdate} WHERE id=${response.id}`)
+    viewAllEmployees();
+    } catch (err) {
+        console.log(err);
+    }  
+    })
+};
 
 start();
