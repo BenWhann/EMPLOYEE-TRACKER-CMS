@@ -16,6 +16,11 @@ const db = mysql.createConnection(
     if(err) console.log(err)
    })
 
+// function sourceSchemaSeeds() {
+//     db.query("SOURCE schema.sql");
+//     db.query("SOURCE seeds.sql")
+// };
+
 function start() {
 inquirer
     .prompt([
@@ -59,6 +64,8 @@ inquirer
         }
     })
 };
+
+
 
 async function viewAllDepartments() {
     const [departments] = await db.promise().query("SELECT * FROM department")
@@ -218,7 +225,7 @@ async function updateEmployee() {
     .then(async(response) => {   
         console.log(response);
     try{
-    await db.promise().query(`UPDATE employee SET role_id=${response.roleUpdate} WHERE id=${response.id}`)
+    await db.promise().query(`UPDATE employee SET role_id=${response.roleUpdate} WHERE id=${response.employee_name}`)
     viewAllEmployees();
     } catch (err) {
         console.log(err);
@@ -226,4 +233,5 @@ async function updateEmployee() {
     })
 };
 
+// sourceSchemaSeeds();
 start();
